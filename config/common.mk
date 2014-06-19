@@ -2,6 +2,10 @@
 PRODUCT_BRAND ?= liquidsmooth
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
 
+ifeq ($(LS_OFFICIAL_BUILD),true)
+LS_BUILD := OFFICIAL
+endif
+
 # overrides
 PRODUCT_PROPERTY_OVERRIDES += \
     keyguard.no_require_sim=true \
@@ -89,8 +93,12 @@ PRODUCT_PACKAGES += \
     LiquidFileManager \
     LiquidLauncher \
     LiquidPapers \
-    LiquidStats \
-    LiquidUpdater
+    LiquidStats
+
+ifeq ($(LS_BUILD), OFFICIAL)
+# Build ota and stats app only with OFFICIAL builds
+PRODUCT_PACKAGES += LiquidUpdater
+endif
 
 # superuser
 SUPERUSER_EMBEDDED := true
@@ -176,7 +184,11 @@ ifeq ($(RELEASE),true)
     LIQUID_VERSION := LS-KK-v$(LIQUID_VERSION_MAJOR).$(LIQUID_VERSION_MINOR)-$(LIQUID_VERSION_STATE)
 else
     LIQUID_VERSION_STATE := $(shell date +%Y-%m-%d)
+ifeq ($(LS_BUILD), OFFICIAL)
     LIQUID_VERSION := LS-KK-v$(LIQUID_VERSION_MAJOR).$(LIQUID_VERSION_MINOR)-$(LIQUID_VERSION_STATE)
+else
+    LIQUID_VERSION := LS-KK-v$(LIQUID_VERSION_MAJOR).$(LIQUID_VERSION_MINOR)-$(LIQUID_VERSION_STATE)-UNOFFICIAL
+endif
 endif
 
 PRODUCT_PROPERTY_OVERRIDES += \
